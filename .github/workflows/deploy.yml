@@ -30,7 +30,14 @@ jobs:
     - name: Build React app
       run: |
         cd frontend
+        pwd
+        ls -la
+        ls -la public/
         npm run build
+        
+    - name: List files in frontend/public
+      run: |
+        ls -la frontend/public/
         
     - name: Setup Pages
       uses: actions/configure-pages@v4

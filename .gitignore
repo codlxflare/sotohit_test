@@ -160,4 +160,3 @@ venv/
 dmypy.json
 
 # GitHub Pages
-.github/workflows/

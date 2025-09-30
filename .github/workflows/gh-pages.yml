@@ -39,6 +39,14 @@ jobs:
         cd frontend
         npm run build
         
+    - name: Copy Images to Build
+      run: |
+        cd frontend/build
+        # Copy all images from root to build directory
+        cp ../../*.webp . 2>/dev/null || true
+        cp ../../*.png . 2>/dev/null || true
+        echo "✅ Images copied to build directory"
+        
     - name: Fix Static Paths for GitHub Pages
       run: |
         cd frontend/build
@@ -56,6 +64,9 @@ jobs:
       run: |
         # Copy build files to root for GitHub Pages
         cp -r frontend/build/* .
+        # Ensure images are also copied
+        cp ../../*.webp . 2>/dev/null || true
+        cp ../../*.png . 2>/dev/null || true
         # Fix paths in index.html
         sed -i 's|src="/sotohit_test/|src="./|g' index.html
         sed -i 's|href="/sotohit_test/|href="./|g' index.html

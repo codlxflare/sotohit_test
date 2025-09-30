@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import PremiumHeader from "./components/PremiumHeader";
 import ModernHero from "./components/ModernHero";
 import MainSections from "./components/MainSections";
@@ -48,7 +48,7 @@ function App() {
   return (
     <MobileMenuProvider>
       <div className="App">
-        <BrowserRouter>
+        <HashRouter>
           <PremiumHeader cartCount={cartCount} />
           <Routes>
             <Route path="/" element={<Home addToCart={addToCart} />} />
@@ -63,7 +63,7 @@ function App() {
           </Routes>
           <Footer />
           <BottomNavBar cartCount={cartCount} />
-        </BrowserRouter>
+        </HashRouter>
       </div>
     </MobileMenuProvider>
   );

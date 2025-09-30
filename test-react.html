@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>React Test</title>
+</head>
+<body>
+    <div id="root">
+        <h1>React Test Page</h1>
+        <p>If you see this, React is not loading properly.</p>
+    </div>
+    
+    <script>
+        console.log('Test page loaded');
+        // Test if React is working
+        setTimeout(() => {
+            const root = document.getElementById('root');
+            if (root.innerHTML.includes('React Test Page')) {
+                console.error('React is NOT working - showing fallback content');
+            } else {
+                console.log('React is working - content replaced');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

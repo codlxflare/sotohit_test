@@ -1,0 +1,91 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install Dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Copy Images to Build
+      run: |
+        cd frontend/build
+        # Copy all images from root to build directory
+        cp ../../*.webp . 2>/dev/null || true
+        cp ../../*.png . 2>/dev/null || true
+        echo "✅ Images copied to build directory"
+        
+    - name: Fix Static Paths for GitHub Pages
+      run: |
+        cd frontend/build
+        # Fix all absolute paths to relative paths
+        sed -i 's|src="/sotohit_test/|src="./|g' index.html
+        sed -i 's|href="/sotohit_test/|href="./|g' index.html
+        sed -i 's|src="/|src="./|g' index.html
+        sed -i 's|href="/|href="./|g' index.html
+        echo "✅ Fixed paths for GitHub Pages"
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Copy build files to root
+      run: |
+        # Copy build files to root for GitHub Pages
+        cp -r frontend/build/* .
+        # Ensure images are also copied
+        cp ../../*.webp . 2>/dev/null || true
+        cp ../../*.png . 2>/dev/null || true
+        # Fix paths in index.html
+        sed -i 's|src="/sotohit_test/|src="./|g' index.html
+        sed -i 's|href="/sotohit_test/|href="./|g' index.html
+        sed -i 's|src="/|src="./|g' index.html
+        sed -i 's|href="/|href="./|g' index.html
+        echo "✅ Files copied to root and paths fixed"
+        
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: .
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

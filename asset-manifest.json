@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/sotohit_test/static/css/main.c0fb5384.css",
+    "main.js": "/sotohit_test/static/js/main.076c115e.js",
+    "index.html": "/sotohit_test/index.html",
+    "main.c0fb5384.css.map": "/sotohit_test/static/css/main.c0fb5384.css.map",
+    "main.076c115e.js.map": "/sotohit_test/static/js/main.076c115e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c0fb5384.css",
+    "static/js/main.076c115e.js"
+  ]
+}

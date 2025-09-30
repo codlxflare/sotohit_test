@@ -52,10 +52,21 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
+    - name: Copy build files to root
+      run: |
+        # Copy build files to root for GitHub Pages
+        cp -r frontend/build/* .
+        # Fix paths in index.html
+        sed -i 's|src="/sotohit_test/|src="./|g' index.html
+        sed -i 's|href="/sotohit_test/|href="./|g' index.html
+        sed -i 's|src="/|src="./|g' index.html
+        sed -i 's|href="/|href="./|g' index.html
+        echo "✅ Files copied to root and paths fixed"
+        
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: frontend/build
+        path: .
 
   deploy:
     environment:

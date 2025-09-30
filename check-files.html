@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>File Check - Sotohit</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .file { margin: 5px 0; padding: 5px; border: 1px solid #ddd; }
+        .exists { background: #d4edda; }
+        .missing { background: #f8d7da; }
+        img { max-width: 100px; height: auto; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Проверка файлов Sotohit</h1>
+    
+    <h2>Изображения:</h2>
+    <div id="images"></div>
+    
+    <h2>Статические файлы:</h2>
+    <div id="static"></div>
+    
+    <script>
+        const images = [
+            'logo.png', 'airpods.webp', 'airtag.webp', 'apple_mac.webp', 'apple_watch.webp',
+            'dyson.webp', 'game.webp', 'img_32.webp', 'ipad_new_2022.webp',
+            'iphone_14_colors.webp', 'iphone_15.webp', 'iphone_15_plus.webp',
+            'iphone_16_all_color.webp', 'iphone_16_plus.webp', 'iphone_16_pro_max.webp',
+            'iphone_16e.webp', 'iphone_17_pro_all_colors.webp', 'iphone_17_pro_max_all_colors.webp',
+            'iphone_17_promo.webp', 'iphone_air_promo.webp', 'iphone-13-wallpapers-and-model-colors.webp',
+            'remeshki_apple_watch.webp', 'snimok_ekrana_2022-10-02_v_150038.webp', 'usb.webp'
+        ];
+        
+        const staticFiles = [
+            'static/css/main.c0fb5384.css',
+            'static/js/main.076c115e.js',
+            'index.html'
+        ];
+        
+        function checkFile(filename, container) {
+            const img = new Image();
+            img.onload = function() {
+                const div = document.createElement('div');
+                div.className = 'file exists';
+                div.innerHTML = `✅ ${filename} <img src="${filename}" alt="${filename}">`;
+                container.appendChild(div);
+            };
+            img.onerror = function() {
+                const div = document.createElement('div');
+                div.className = 'file missing';
+                div.innerHTML = `❌ ${filename} - НЕ НАЙДЕН`;
+                container.appendChild(div);
+            };
+            img.src = filename;
+        }
+        
+        function checkStaticFile(filename, container) {
+            fetch(filename)
+                .then(response => {
+                    const div = document.createElement('div');
+                    if (response.ok) {
+                        div.className = 'file exists';
+                        div.innerHTML = `✅ ${filename}`;
+                    } else {
+                        div.className = 'file missing';
+                        div.innerHTML = `❌ ${filename} - ${response.status}`;
+                    }
+                    container.appendChild(div);
+                })
+                .catch(error => {
+                    const div = document.createElement('div');
+                    div.className = 'file missing';
+                    div.innerHTML = `❌ ${filename} - ОШИБКА: ${error.message}`;
+                    container.appendChild(div);
+                });
+        }
+        
+        // Проверяем изображения
+        images.forEach(filename => {
+            checkFile(filename, document.getElementById('images'));
+        });
+        
+        // Проверяем статические файлы
+        staticFiles.forEach(filename => {
+            checkStaticFile(filename, document.getElementById('static'));
+        });
+    </script>
+</body>
+</html>

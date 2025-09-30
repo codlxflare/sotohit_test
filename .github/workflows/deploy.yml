@@ -1,0 +1,135 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        
+    - name: Create Deployment Package
+      run: |
+        # Create deployment directory
+        mkdir -p deploy
+        
+        # Copy frontend build
+        cp -r frontend/build/* deploy/
+        
+        # Copy backend
+        cp -r backend deploy/
+        
+        # Create deployment files
+        cat > deploy/start.sh << 'EOF'
+        #!/bin/bash
+        echo "Starting Sotohit Application..."
+        
+        # Start backend in background
+        cd backend
+        python server.py &
+        BACKEND_PID=$!
+        
+        # Start frontend server
+        cd ..
+        python -m http.server 3000 &
+        FRONTEND_PID=$!
+        
+        echo "Backend started with PID: $BACKEND_PID"
+        echo "Frontend started with PID: $FRONTEND_PID"
+        echo "Application available at: http://localhost:3000"
+        
+        # Wait for processes
+        wait $BACKEND_PID $FRONTEND_PID
+        EOF
+        
+        chmod +x deploy/start.sh
+        
+        # Create Windows batch file
+        cat > deploy/start.bat << 'EOF'
+        @echo off
+        echo Starting Sotohit Application...
+        
+        start /B cmd /c "cd backend && python server.py"
+        start /B cmd /c "python -m http.server 3000"
+        
+        echo Application started!
+        echo Backend: http://localhost:8000
+        echo Frontend: http://localhost:3000
+        pause
+        EOF
+        
+        # Create README for deployment
+        cat > deploy/README.md << 'EOF'
+        # Sotohit Deployment
+        
+        ## Quick Start
+        
+        ### Windows
+        ```bash
+        start.bat
+        ```
+        
+        ### Linux/Mac
+        ```bash
+        ./start.sh
+        ```
+        
+        ## Manual Start
+        
+        ### Backend
+        ```bash
+        cd backend
+        pip install -r requirements.txt
+        python server.py
+        ```
+        
+        ### Frontend
+        ```bash
+        python -m http.server 3000
+        ```
+        
+        ## Access
+        - Frontend: http://localhost:3000
+        - Backend API: http://localhost:8000
+        EOF
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./deploy
+        cname: # Add your custom domain here if you have one

@@ -39,12 +39,13 @@ jobs:
         cd frontend
         npm run build
         
-    - name: Fix Static Paths
+    - name: Fix Static Paths for GitHub Pages
       run: |
         cd frontend/build
-        # Fix paths for GitHub Pages
-        sed -i 's|src="/static/|src="./static/|g' index.html
-        sed -i 's|href="/static/|href="./static/|g' index.html
+        # Fix all absolute paths to relative paths
+        sed -i 's|src="/|src="./|g' index.html
+        sed -i 's|href="/|href="./|g' index.html
+        echo "✅ Fixed paths for GitHub Pages"
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
